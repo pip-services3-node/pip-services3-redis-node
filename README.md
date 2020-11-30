@@ -4,7 +4,7 @@ This module is a part of the [Pip.Services](http://pipservices.org) polyglot mic
 
 The module for working with a Redis database of type key-value contains components for working with cache and locks: RedisCache and RedisLock.
 
-This module contains the following packages:
+The module contains the following packages:
 
 - **Build** - factory default
 - **Cache** - Redis Cache Components
