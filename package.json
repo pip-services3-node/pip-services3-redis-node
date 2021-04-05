@@ -1,6 +1,6 @@
 {
     "name": "pip-services-redis-node",
-    "version": "3.0.2",
+    "version": "3.0.3",
     "author": "Conceptual Vision Consulting LLC",
     "description": "Redis components for Pip.Services in Node.js",
     "contributors": [
@@ -34,17 +34,17 @@
         "retest": "tsc && mocha -t 10000 -R spec -u tdd --recursive ./obj/test"
     },
     "dependencies": {
-        "redis": "^2.8.0",
         "pip-services3-commons-node": "^3.0.4",
-        "pip-services3-components-node": "^3.0.6"
+        "pip-services3-components-node": "^3.0.6",
+        "redis": "^3.1.0"
     },
     "devDependencies": {
         "@types/async": "^2.0.0",
-        "@types/chai": "*",
+        "@types/chai": "^4.0.0",
         "@types/lodash": "^4.0.0",
-        "@types/mocha": "*",
+        "@types/mocha": "^8.0.0",
         "@types/node": "*",
-        "chai": "*",
-        "mocha": "^7.2.0"
+        "chai": "^4.3.4",
+        "mocha": "^8.3.2"
     }
 }
