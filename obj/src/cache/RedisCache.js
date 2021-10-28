@@ -194,7 +194,13 @@ class RedisCache {
     retrieve(correlationId, key, callback) {
         if (!this.checkOpened(correlationId, callback))
             return;
-        this._client.get(key, callback);
+        this._client.get(key, (err, item) => {
+            if (err) {
+                callback(err, null);
+                return;
+            }
+            callback(err, JSON.parse(item));
+        });
     }
     /**
      * Stores value in the cache with expiration time.
@@ -208,6 +214,7 @@ class RedisCache {
     store(correlationId, key, value, timeout, callback) {
         if (!this.checkOpened(correlationId, callback))
             return;
+        value = JSON.stringify(value);
         this._client.set(key, value, 'PX', timeout, callback);
     }
     /**

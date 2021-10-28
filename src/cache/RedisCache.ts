@@ -62,7 +62,7 @@ import { ICache } from 'pip-services3-components-node';
 export class RedisCache implements ICache, IConfigurable, IReferenceable, IOpenable {
     private _connectionResolver: ConnectionResolver = new ConnectionResolver();
     private _credentialResolver: CredentialResolver = new CredentialResolver();
-    
+
     private _timeout: number = 30000;
     private _retries: number = 3;
 
@@ -71,7 +71,7 @@ export class RedisCache implements ICache, IConfigurable, IReferenceable, IOpena
     /**
      * Creates a new instance of this cache.
      */
-    public constructor() {}
+    public constructor() { }
 
     /**
      * Configures component by passing configuration parameters.
@@ -87,9 +87,9 @@ export class RedisCache implements ICache, IConfigurable, IReferenceable, IOpena
     }
 
     /**
-	 * Sets references to dependent components.
-	 * 
-	 * @param references 	references to locate the component dependencies. 
+     * Sets references to dependent components.
+     * 
+     * @param references 	references to locate the component dependencies. 
      */
     public setReferences(references: IReferences): void {
         this._connectionResolver.setReferences(references);
@@ -97,18 +97,18 @@ export class RedisCache implements ICache, IConfigurable, IReferenceable, IOpena
     }
 
     /**
-	 * Checks if the component is opened.
-	 * 
-	 * @returns true if the component has been opened and false otherwise.
+     * Checks if the component is opened.
+     * 
+     * @returns true if the component has been opened and false otherwise.
      */
     public isOpen(): boolean {
         return this._client;
     }
 
     /**
-	 * Opens the component.
-	 * 
-	 * @param correlationId 	(optional) transaction id to trace execution through call chain.
+     * Opens the component.
+     * 
+     * @param correlationId 	(optional) transaction id to trace execution through call chain.
      * @param callback 			callback function that receives error or null no errors occured.
      */
     public open(correlationId: string, callback: (err: any) => void): void {
@@ -136,10 +136,10 @@ export class RedisCache implements ICache, IConfigurable, IReferenceable, IOpena
                     // max_attempts: this._retries,
                     retry_strategy: (options) => { return this.retryStrategy(options); }
                 };
-                
+
                 if (connection.getUri() != null) {
                     options.url = connection.getUri();
-                } else {                    
+                } else {
                     options.host = connection.getHost() || 'localhost';
                     options.port = connection.getPort() || 6379;
                 }
@@ -147,25 +147,25 @@ export class RedisCache implements ICache, IConfigurable, IReferenceable, IOpena
                 if (credential != null) {
                     options.password = credential.getPassword();
                 }
-    
+
                 let redis = require('redis');
                 this._client = redis.createClient(options);
-    
-                if (callback) callback(null);    
+
+                if (callback) callback(null);
             }
         ], callback);
     }
 
     /**
-	 * Closes component and frees used resources.
-	 * 
-	 * @param correlationId 	(optional) transaction id to trace execution through call chain.
+     * Closes component and frees used resources.
+     * 
+     * @param correlationId 	(optional) transaction id to trace execution through call chain.
      * @param callback 			callback function that receives error or null no errors occured.
      */
     public close(correlationId: string, callback: (err: any) => void): void {
         if (this._client != null) {
             this._client.quit(((err) => {
-                this._client = null;    
+                this._client = null;
                 if (callback) callback(err);
             }));
         } else {
@@ -179,10 +179,10 @@ export class RedisCache implements ICache, IConfigurable, IReferenceable, IOpena
             callback(err, null);
             return false;
         }
-        
+
         return true;
     }
-    
+
     private retryStrategy(options: any): any {
         if (options.error && options.error.code === 'ECONNREFUSED') {
             // End reconnecting on a specific error and flush all commands with
@@ -214,7 +214,13 @@ export class RedisCache implements ICache, IConfigurable, IReferenceable, IOpena
         callback: (err: any, value: any) => void): void {
         if (!this.checkOpened(correlationId, callback)) return;
 
-        this._client.get(key, callback);
+        this._client.get(key, (err, item) => {
+            if (err) {
+                callback(err, null);
+                return;
+            }
+            callback(err, JSON.parse(item));
+        });
     }
 
     /**
@@ -229,6 +235,8 @@ export class RedisCache implements ICache, IConfigurable, IReferenceable, IOpena
     public store(correlationId: string, key: string, value: any, timeout: number,
         callback: (err: any) => void): void {
         if (!this.checkOpened(correlationId, callback)) return;
+
+        value = JSON.stringify(value);
 
         this._client.set(key, value, 'PX', timeout, callback);
     }
@@ -246,5 +254,5 @@ export class RedisCache implements ICache, IConfigurable, IReferenceable, IOpena
 
         this._client.del(key, callback);
     }
-    
+
 }
