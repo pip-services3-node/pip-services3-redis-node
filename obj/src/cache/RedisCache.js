@@ -199,7 +199,7 @@ class RedisCache {
                 callback(err, null);
                 return;
             }
-            callback(err, JSON.parse(item));
+            callback(err, item ? JSON.parse(item) : item);
         });
     }
     /**
@@ -214,8 +214,7 @@ class RedisCache {
     store(correlationId, key, value, timeout, callback) {
         if (!this.checkOpened(correlationId, callback))
             return;
-        value = JSON.stringify(value);
-        this._client.set(key, value, 'PX', timeout, callback);
+        this._client.set(key, JSON.stringify(value), 'PX', timeout, callback);
     }
     /**
      * Removes a value from the cache by its key.

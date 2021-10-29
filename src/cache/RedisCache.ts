@@ -219,7 +219,7 @@ export class RedisCache implements ICache, IConfigurable, IReferenceable, IOpena
                 callback(err, null);
                 return;
             }
-            callback(err, JSON.parse(item));
+            callback(err, item ? JSON.parse(item) : item);
         });
     }
 
@@ -236,9 +236,7 @@ export class RedisCache implements ICache, IConfigurable, IReferenceable, IOpena
         callback: (err: any) => void): void {
         if (!this.checkOpened(correlationId, callback)) return;
 
-        value = JSON.stringify(value);
-
-        this._client.set(key, value, 'PX', timeout, callback);
+        this._client.set(key, JSON.stringify(value), 'PX', timeout, callback);
     }
 
     /**
